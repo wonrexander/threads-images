@@ -105,10 +105,15 @@ def main():
             if DRY:
                 log(f"[시험] 대화 {cv['id']} → 링크 대상")
                 continue
+            # 댓글 없이 DM 만 온 사람은 어느 영상을 보고 왔는지 모른다 — 최근 48시간 영상(최대 3편)의 링크를 모두 보낸다.
+            # 같은 날 여러 상품을 올린 경우에도 원하는 상품 링크를 받게(2026-10-24 사용자: "한번에 여러 개 업로드된 경우 여러 링크")
+            recent = [q for q in posts if time.time() - q["at"] <= 48 * 3600][:3] or posts[:1]
+            text = dm_text(recent[0]["msg"]) if len(recent) == 1 else \
+                "안녕하세요! 최근 영상 속 제품 링크 보내드려요 😊\n\n" + "\n\n".join(q["msg"] for q in recent)
             try:
                 api("POST", f"{IG}/{uid}/messages", {"recipient": json.dumps({"id": frm["id"]}),
-                                                     "message": json.dumps({"text": dm_text(posts[0]["msg"])}, ensure_ascii=False), "access_token": tk})
-                log(f"대화 {cv['id']} → 최근 영상({posts[0]['slug']}) 링크 보냄")
+                                                     "message": json.dumps({"text": text[:990]}, ensure_ascii=False), "access_token": tk})
+                log(f"대화 {cv['id']} → 최근 영상 {len(recent)}편 링크 보냄")
                 sent += 1
             except RuntimeError as x:
                 log(f"대화 {cv['id']} 답장 실패 {x}")
