@@ -1,0 +1,31 @@
+# 쓰레드광고 상품(화보 캐러셀·짧은 영상) 댓글 → DM 링크 (dm-bot/products_bot.py) — 10분마다, 컴퓨터가 꺼져 있어도. 2026-10-24
+# 광고 쇼츠 dm-bot.yml 과 따로 돈다(맡는 글이 다르다). GitHub 의 예약 실행은 붐비면 몇 분~십몇 분 늦을 수 있다.
+name: products-dm
+on:
+  schedule:
+    - cron: "3,13,23,33,43,53 * * * *"
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: products-dm
+  cancel-in-progress: false
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: 상품 댓글 → DM 링크
+        env:
+          INSTAGRAM_ACCESS_TOKEN: ${{ secrets.INSTAGRAM_ACCESS_TOKEN }}
+        run: python dm-bot/products_bot.py
+      - name: 처리 기록 저장
+        run: |
+          git config user.name "products-dm"
+          git config user.email "products-dm@users.noreply.github.com"
+          git add dm-bot/products_state.json
+          git diff --cached --quiet || (git commit -m "products-dm: 처리 기록 [skip ci]" && git pull --rebase && git push)
