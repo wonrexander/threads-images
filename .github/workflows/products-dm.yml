@@ -1,9 +1,9 @@
-# 쓰레드광고 상품(화보 캐러셀·짧은 영상) 댓글 → DM 링크 (dm-bot/products_bot.py) — 10분마다, 컴퓨터가 꺼져 있어도. 2026-10-24
+# 쓰레드광고 상품(화보 캐러셀·짧은 영상) 댓글 → DM 링크 (dm-bot/products_bot.py) — 5분마다, 컴퓨터가 꺼져 있어도. 2026-10-24
 # 광고 쇼츠 dm-bot.yml 과 따로 돈다(맡는 글이 다르다). GitHub 의 예약 실행은 붐비면 몇 분~십몇 분 늦을 수 있다.
 name: products-dm
 on:
   schedule:
-    - cron: "3,13,23,33,43,53 * * * *"
+    - cron: "*/5 * * * *"
   workflow_dispatch:
 permissions:
   contents: write
