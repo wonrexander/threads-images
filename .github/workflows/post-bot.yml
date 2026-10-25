@@ -3,7 +3,13 @@
 name: post-bot
 on:
   schedule:
-    - cron: "0 14 * * *"
+    # 정각(:00)은 GitHub 예약이 몰려 크게 늦는다(2026-10-24: 14:00 UTC 예약이 17:05 에 돌아 새벽 2시 게시).
+    # 정각을 피한 여러 시각에 걸고, post_bot.py 가 '오늘 이미 올렸으면' 건너뛴다(하루 한 편). 22:47 KST 부터.
+    - cron: "47 13 * * *"
+    - cron: "56 13 * * *"
+    - cron: "9 14 * * *"
+    - cron: "23 14 * * *"
+    - cron: "41 14 * * *"
   workflow_dispatch:
 permissions:
   contents: write
