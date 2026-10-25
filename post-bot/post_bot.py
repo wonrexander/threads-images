@@ -96,6 +96,13 @@ def video_ready(url):
 
 def main():
     tk_ig, tk_th = os.environ["INSTAGRAM_ACCESS_TOKEN"], os.environ["THREADS_ACCESS_TOKEN"]
+    # 예약이 여러 번 걸려 있다(GitHub 지연 대비) — 하루 한 편만. 최근 12시간 안에 올린 편이 있으면 건너뛴다.
+    # 수동 실행(workflow_dispatch)은 이 검사를 건너뛴다.
+    if os.environ.get("GITHUB_EVENT_NAME") == "schedule":
+        recent = [p for p in POSTED.glob("*.json") if time.time() - json.loads(p.read_text(encoding="utf-8")).get("posted_at", 0) < 12 * 3600]
+        if recent:
+            log(f"오늘 이미 올렸다({recent[0].stem}) — 건너뜀")
+            return
     items = sorted(QUEUE.glob("*.json"), key=lambda p: json.loads(p.read_text(encoding="utf-8")).get("ready_at", ""))
     if not items:
         log("게시 대기열이 비어 있다 — 오늘은 올릴 영상이 없다")
