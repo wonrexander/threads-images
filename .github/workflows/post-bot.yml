@@ -10,7 +10,14 @@ on:
     - cron: "9 14 * * *"
     - cron: "23 14 * * *"
     - cron: "41 14 * * *"
+  # 외부 예약 서비스(cron-job.org)가 23:00 KST 에 정확히 이것을 부른다(2026-10-27 — GitHub 예약은 2~5시간씩 늦었다).
+  # 위 GitHub 예약은 예비로 남긴다. 하루 한 편·22:30~06:00 검사는 post_bot.py 가 한다. force=true 는 사람이 즉시 올릴 때만.
   workflow_dispatch:
+    inputs:
+      force:
+        description: "시간대·하루 한 편 검사를 건너뛰고 지금 올린다"
+        required: false
+        default: "false"
 permissions:
   contents: write
 concurrency:
@@ -29,6 +36,7 @@ jobs:
         env:
           INSTAGRAM_ACCESS_TOKEN: ${{ secrets.INSTAGRAM_ACCESS_TOKEN }}
           THREADS_ACCESS_TOKEN: ${{ secrets.THREADS_ACCESS_TOKEN }}
+          POST_FORCE: ${{ github.event.inputs.force || 'false' }}
         run: python post-bot/post_bot.py
       - name: 결과 저장(실패해도 일부 결과는 남긴다)
         if: always()
