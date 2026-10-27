@@ -96,9 +96,14 @@ def video_ready(url):
 
 def main():
     tk_ig, tk_th = os.environ["INSTAGRAM_ACCESS_TOKEN"], os.environ["THREADS_ACCESS_TOKEN"]
-    # 예약이 여러 번 걸려 있다(GitHub 지연 대비) — 하루 한 편만. 최근 12시간 안에 올린 편이 있으면 건너뛴다.
-    # 수동 실행(workflow_dispatch)은 이 검사를 건너뛴다.
-    if os.environ.get("GITHUB_EVENT_NAME") == "schedule":
+    # 실행 요청은 GitHub 예약(늦다)과 외부 예약 서비스(cron-job.org, 2026-10-27 사용자 선택) 양쪽에서 온다 — 하루 한 편만,
+    # 22:30~06:00 KST 에만 올린다. 사람이 '지금 올려'라고 할 때만 force=true 로 둘 다 건너뛴다.
+    if os.environ.get("POST_FORCE", "false") != "true":
+        k = time.gmtime(time.time() + 9 * 3600)
+        hm = k.tm_hour * 60 + k.tm_min
+        if not (hm >= 22 * 60 + 30 or hm < 6 * 60):
+            log("게시 시간대(22:30~06:00 KST)가 아니다 — 건너뜀")
+            return
         recent = [p for p in POSTED.glob("*.json") if time.time() - json.loads(p.read_text(encoding="utf-8")).get("posted_at", 0) < 12 * 3600]
         if recent:
             log(f"오늘 이미 올렸다({recent[0].stem}) — 건너뜀")
