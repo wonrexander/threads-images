@@ -35,5 +35,5 @@ jobs:
         run: |
           git config user.name "post-bot"
           git config user.email "post-bot@users.noreply.github.com"
-          git add -A post-queue post-bot dm-bot videos
+          git add -A  # 폴더를 지정하면 대기열이 비어 post-queue 가 없을 때 pathspec 오류로 실패했다(2026-10-25~26)
           git diff --cached --quiet || (git commit -m "post-bot: 게시 결과 [skip ci]" && git pull --rebase && git push)
