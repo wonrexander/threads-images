@@ -1,0 +1,27 @@
+{
+ "slug": "auto2610291300ts",
+ "posted_at": 1793301588.5799873,
+ "default": {
+  "instagram": {
+   "id": "18126441448924588",
+   "permalink": "https://www.instagram.com/reel/DfFvVqsCOaY/",
+   "at": "2026-10-29T19:18:32+0000"
+  },
+  "threads": {
+   "id": "18002879961001837",
+   "permalink": "https://www.threads.com/@alligator.16136460/post/DfFvc6oCun4",
+   "at": "2026-10-29T19:19:32+0000"
+  },
+  "instagram_comment": {
+   "id": "18120271267979488"
+  },
+  "threads_reply": {
+   "id": "18185906836423767"
+  }
+ },
+ "hook": "",
+ "first_line": "얘들아, 말하면 끝이야!",
+ "format_tag": "대결/내기",
+ "program": "toss",
+ "sec": 37.0
+}
