@@ -162,11 +162,12 @@ def main():
     if err:
         sys.exit(err)  # 대기열에 남겨 둔다 — 다음 실행(수동 또는 다음 날)이 빠진 것만 한다
 
-    # DM 봇에 이 상품 링크 알리기
-    posts = json.loads(DM_POSTS.read_text(encoding="utf-8")) if DM_POSTS.exists() else []
-    posts = [p for p in posts if p["slug"] != q["slug"]] + [{"slug": q["slug"], "at": time.time(), "ig": res["instagram"]["id"],
-                                                              "th": res["threads"]["id"], "msg": q.get("msg", "")}]
-    DM_POSTS.write_text(json.dumps(posts, ensure_ascii=False, indent=1), encoding="utf-8")
+    # DM 봇에 이 상품 링크 알리기(일반 영상은 링크가 없어 건너뛴다, 2026-10-29)
+    if q.get("msg"):
+        posts = json.loads(DM_POSTS.read_text(encoding="utf-8")) if DM_POSTS.exists() else []
+        posts = [p for p in posts if p["slug"] != q["slug"]] + [{"slug": q["slug"], "at": time.time(), "ig": res["instagram"]["id"],
+                                                                  "th": res["threads"]["id"], "msg": q.get("msg", "")}]
+        DM_POSTS.write_text(json.dumps(posts, ensure_ascii=False, indent=1), encoding="utf-8")
     POSTED.mkdir(parents=True, exist_ok=True)
     (POSTED / f"{q['slug']}.json").write_text(json.dumps({"slug": q["slug"], "posted_at": time.time(), "default": res, **{k: q.get(k) for k in ("hook", "first_line", "format_tag", "program", "sec")}}, ensure_ascii=False, indent=1), encoding="utf-8")
     (ROOT / q["video"]).unlink(missing_ok=True)
