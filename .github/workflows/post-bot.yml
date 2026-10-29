@@ -28,7 +28,11 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
+      # 예약 실행은 '예약된 시점의 커밋'을 받는다 — 앞 실행이 게시 기록을 커밋하기 전 상태라 같은 편을 또 올렸다
+      # (2026-10-27·28 인스타 중복 게시). 항상 최신 main 을 받는다.
       - uses: actions/checkout@v4
+        with:
+          ref: main
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
