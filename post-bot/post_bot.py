@@ -127,6 +127,16 @@ def main():
                 res["instagram"] = {"id": m["id"], "permalink": m.get("permalink"), "at": m.get("timestamp"), "found": "already-posted"}
                 log(f"instagram: 같은 본문이 이미 올라가 있다 — 다시 올리지 않는다 {m.get('permalink')}")
                 break
+    # 스레드도 같은 본문이 최근에 이미 올라가 있으면 다시 올리지 않는다(중복 게시 방지, 2026-10-29)
+    if not res.get("threads", {}).get("id"):
+        try:
+            for t in call("GET", f"{TH}/me/threads", {"fields": "id,text,permalink,timestamp", "limit": 15, "access_token": tk_th}).get("data", []):
+                if (t.get("text") or "").strip() == q["threads"].strip():
+                    res["threads"] = {"id": t["id"], "permalink": t.get("permalink"), "at": t.get("timestamp"), "found": "already-posted"}
+                    log(f"threads: 같은 본문이 이미 올라가 있다 — 다시 올리지 않는다 {t.get('permalink')}")
+                    break
+        except Exception as e:
+            log(f"threads: 중복 확인 실패(그대로 진행) {e}")
     err = None
     for plat, fn, args in (("instagram", instagram, (url, q["instagram"], tk_ig, uid)), ("threads", threads, (url, q["threads"], tk_th))):
         if res.get(plat, {}).get("id"):
