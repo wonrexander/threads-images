@@ -54,8 +54,8 @@ def wait(url, token, field, label, limit=600):
     raise RuntimeError(f"{label} 처리가 {limit}초 안에 끝나지 않았다")
 
 
-def instagram(video_url, caption, tk, uid):
-    c = call("POST", f"{IG}/{uid}/media", {"media_type": "REELS", "video_url": video_url, "caption": caption, "share_to_feed": "true", "access_token": tk})
+def instagram(video_url, caption, tk, uid, cover_ms=800):  # 커버 = 훅 장면(2026-10-29)
+    c = call("POST", f"{IG}/{uid}/media", {"media_type": "REELS", "video_url": video_url, "caption": caption, "share_to_feed": "true", "thumb_offset": str(cover_ms), "access_token": tk})
     wait(f"{IG}/{c['id']}", tk, "status_code", "인스타그램 영상")
     pub = call("POST", f"{IG}/{uid}/media_publish", {"creation_id": c["id"], "access_token": tk})
     info = call("GET", f"{IG}/{pub['id']}", {"fields": "permalink,timestamp", "access_token": tk})
@@ -138,7 +138,7 @@ def main():
         except Exception as e:
             log(f"threads: 중복 확인 실패(그대로 진행) {e}")
     err = None
-    for plat, fn, args in (("instagram", instagram, (url, q["instagram"], tk_ig, uid)), ("threads", threads, (url, q["threads"], tk_th))):
+    for plat, fn, args in (("instagram", instagram, (url, q["instagram"], tk_ig, uid, q.get("cover_ms", 800))), ("threads", threads, (url, q["threads"], tk_th))):
         if res.get(plat, {}).get("id"):
             log(f"{plat}: 이미 올림 {res[plat].get('permalink')}")
             continue
@@ -168,7 +168,7 @@ def main():
                                                               "th": res["threads"]["id"], "msg": q.get("msg", "")}]
     DM_POSTS.write_text(json.dumps(posts, ensure_ascii=False, indent=1), encoding="utf-8")
     POSTED.mkdir(parents=True, exist_ok=True)
-    (POSTED / f"{q['slug']}.json").write_text(json.dumps({"slug": q["slug"], "posted_at": time.time(), "default": res}, ensure_ascii=False, indent=1), encoding="utf-8")
+    (POSTED / f"{q['slug']}.json").write_text(json.dumps({"slug": q["slug"], "posted_at": time.time(), "default": res, **{k: q.get(k) for k in ("hook", "first_line", "format_tag", "program", "sec")}}, ensure_ascii=False, indent=1), encoding="utf-8")
     (ROOT / q["video"]).unlink(missing_ok=True)
     qf.unlink()
     log(f"완료: {q['slug']} — 대기열 {len(items) - 1}편 남음")
