@@ -1,0 +1,33 @@
+# 광고 쇼츠 성과 수집(post-bot/insights.py) — 하루 두 번, 게시 24·72시간 뒤 지표를 남긴다. 2026-10-29
+name: insights
+on:
+  schedule:
+    - cron: "17 1 * * *"
+    - cron: "37 13 * * *"
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: insights
+  cancel-in-progress: false
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: 성과 수집
+        env:
+          INSTAGRAM_ACCESS_TOKEN: ${{ secrets.INSTAGRAM_ACCESS_TOKEN }}
+        run: python post-bot/insights.py
+      - name: 기록 저장
+        run: |
+          git config user.name "insights-bot"
+          git config user.email "insights-bot@users.noreply.github.com"
+          git add -A
+          git diff --cached --quiet || (git commit -m "insights: 성과 기록 [skip ci]" && git pull --rebase && git push)
