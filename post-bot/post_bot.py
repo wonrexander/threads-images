@@ -120,6 +120,13 @@ def main():
     if not video_ready(url):
         sys.exit(f"영상 공개 주소가 열리지 않는다: {url}")
     uid = call("GET", f"{IG}/me", {"fields": "user_id", "access_token": tk_ig})["user_id"]
+    # 이중 안전장치: 최근 12시간 안에 같은 본문의 게시물이 이미 있으면 올린 것으로 본다(중복 게시 방지, 2026-10-29)
+    if not res.get("instagram", {}).get("id"):
+        for m in call("GET", f"{IG}/{uid}/media", {"fields": "id,caption,timestamp,permalink", "limit": 15, "access_token": tk_ig}).get("data", []):
+            if (m.get("caption") or "").strip() == q["instagram"].strip():
+                res["instagram"] = {"id": m["id"], "permalink": m.get("permalink"), "at": m.get("timestamp"), "found": "already-posted"}
+                log(f"instagram: 같은 본문이 이미 올라가 있다 — 다시 올리지 않는다 {m.get('permalink')}")
+                break
     err = None
     for plat, fn, args in (("instagram", instagram, (url, q["instagram"], tk_ig, uid)), ("threads", threads, (url, q["threads"], tk_th))):
         if res.get(plat, {}).get("id"):
