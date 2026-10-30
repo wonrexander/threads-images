@@ -62,5 +62,12 @@
   "format_tag": "대결/내기",
   "program": "toss",
   "sec": 37.0
+ },
+ "auto2610301300ts": {
+  "hook": "앞머리만 잘랐는데",
+  "first_line": "세아야, 진짜야?!",
+  "format_tag": "이거 나만 그래?",
+  "program": "organic",
+  "sec": 31.0
  }
 }
