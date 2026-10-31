@@ -61,7 +61,18 @@
   "first_line": "얘들아, 말하면 끝이야!",
   "format_tag": "대결/내기",
   "program": "toss",
-  "sec": 37.0
+  "sec": 37.0,
+  "h24": {
+   "views": 150,
+   "reach": 142,
+   "saved": 0,
+   "shares": 0,
+   "likes": 0,
+   "comments": 1,
+   "avg_watch_sec": 4.1,
+   "watch_ratio": 0.111,
+   "at": "2026-10-31 15:59"
+  }
  },
  "auto2610301300ts": {
   "hook": "앞머리만 잘랐는데",
